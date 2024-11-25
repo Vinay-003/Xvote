@@ -1,6 +1,7 @@
 package com.example.votingapp
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,35 +22,41 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.votingapp.CandidateData.sampleCandidates
+import com.example.votingapp.ElectionData.sampleElections
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.InputStreamReader
 
-class SignupPage : BasePage() {
-    override val title: String = "Sign Up"
+class Register : BasePage() {
+    override val title: String = "Register"
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Content(sampleElections: List<Election>, setCurrentPage: (BasePage) -> Unit) {
-        var name by remember { mutableStateOf("") }
-        var phoneNumber by remember { mutableStateOf("") }
-        var country by remember { mutableStateOf("") }
-        var uidNumber by remember { mutableStateOf("") }
+    fun Content(setCurrentPage: (BasePage) -> Unit) {
+        var fullName by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
         var isTermsChecked by remember { mutableStateOf(false) }
+        var phonenumber by remember { mutableStateOf("") }
+        var country by remember { mutableStateOf("") }
 
+
+        val context = LocalContext.current
+        val countryList = loadCountryList(context)
         var errors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
         val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = Color(0xFF4285F4),
             unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+            focusedLabelColor = Color(0xFF4285F4),
+            unfocusedLabelColor = Color.Gray,
         )
 
-        val context = LocalContext.current
-        val countryList = loadCountryList(context)
+        fun isValidEmail(email: String): Boolean {
+            val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+            return email.matches(emailRegex)
+        }
 
         fun isValidPhoneNumber(phoneNumber: String): Boolean {
             val phoneRegex = "^[+]?[0-9]{10,13}$".toRegex()
@@ -59,31 +66,29 @@ class SignupPage : BasePage() {
         fun validateInputs(): Boolean {
             val newErrors = mutableMapOf<String, String>()
 
-//            if (name.isBlank()) {
-//                newErrors["name"] = "Name is required"
-//            } else if (phoneNumber.isBlank()) {
-//                newErrors["phoneNumber"] = "Phone Number is required"
-//            } else if (!isValidPhoneNumber(phoneNumber)) {
-//                newErrors["phoneNumberInvalid"] = "Invalid Phone Number"
-//            } else if (country.isBlank()) {
-//                newErrors["country"] = "Country is required"
-//            } else if (!countryList.contains(country)) {
-//                newErrors["countryInvalid"] = "Invalid Country Name"
-//            } else if (uidNumber.isBlank()) {
-//                newErrors["uidNumber"] = "UID Number is required"
-//            } else if (email.isBlank()) {
-//                newErrors["email"] = "Email is required"
-//            } else if (password.isBlank()) {
-//                newErrors["password"] = "Password is required"
-//            } else if (confirmPassword.isBlank()) {
-//                newErrors["confirmPassword"] = "Confirm Password is required"
-//            } else if (password != confirmPassword) {
-//                newErrors["passwordMismatch"] = "Passwords do not match"
-//            } else if (password.length <= 6) {
-//                newErrors["passwordLength"] = "Password must be longer than 6 characters"
-//            } else if (!isTermsChecked) {
-//                newErrors["termsUnchecked"] = "You must agree to the Terms and Conditions"
-//            }
+            if (fullName.isBlank()) {
+                newErrors["fullName"] = "Full Name is required"
+            } else if (!isValidPhoneNumber(phonenumber)) {
+                newErrors["phoneNumberInvalid"] = "Invalid Phone Number"
+            } else if (country.isBlank()) {
+                newErrors["country"] = "Country is required"
+            }else if (!isTermsChecked) {
+                newErrors["term check"] = "Accept the term and conditions"
+            }else if (!countryList.contains(country)) {
+                newErrors["countryInvalid"] = "Invalid Country Name"
+            } else if (email.isBlank()) {
+                newErrors["email"] = "Email is required"
+            } else if (!isValidEmail(email)) {
+                newErrors["emailInvalid"] = "Invalid email address"
+            } else if (password.isBlank()) {
+                newErrors["password"] = "Password is required"
+            } else if (confirmPassword.isBlank()) {
+                newErrors["confirmPassword"] = "Confirm Password is required"
+            } else if (password != confirmPassword) {
+                newErrors["passwordMismatch"] = "Passwords do not match"
+            } else if (phonenumber.length <= 10) {
+                newErrors["phone number"] = "PhoneNumber must be of 10 numbers"
+            }
 
             errors = newErrors
             return newErrors.isEmpty()
@@ -96,14 +101,19 @@ class SignupPage : BasePage() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Heading
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = MaterialTheme.typography.headlineSmall.toSpanStyle().copy(color = Color(0xFF4285F4))) {
-                        append("S")
+                    withStyle(
+                        style = MaterialTheme.typography.headlineSmall.toSpanStyle()
+                            .copy(color = Color(0xFF4285F4))
+                    ) {
+                        append("R")
                     }
-                    withStyle(style = MaterialTheme.typography.headlineSmall.toSpanStyle().copy(color = Color.Black)) {
-                        append("ign Up")
+                    withStyle(
+                        style = MaterialTheme.typography.headlineSmall.toSpanStyle()
+                            .copy(color = Color.Black)
+                    ) {
+                        append("egisteration")
                     }
                 },
                 fontSize = 24.sp,
@@ -111,33 +121,33 @@ class SignupPage : BasePage() {
             )
 
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Name Field
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = fullName,
+                    onValueChange = { fullName = it },
                     label = { Text("Full Name") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    isError = errors["name"] != null
+                    isError = errors["fullName"] != null
                 )
-                errors["name"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
+                errors["fullName"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
 
-                // Phone Number Field
                 OutlinedTextField(
-                    value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
+                    value = phonenumber,
+                    onValueChange = { phonenumber = it },
                     label = { Text("Phone Number") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
-                    isError = errors["phoneNumber"] != null || errors["phoneNumberInvalid"] != null
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                    isError = errors["phoneNumberInvalid"] != null
                 )
-                errors["phoneNumber"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
-                errors["phoneNumberInvalid"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
+                errors["phoneNumberInvalid"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
 
-                // Country Field
                 OutlinedTextField(
                     value = country,
                     onValueChange = { country = it },
@@ -150,32 +160,23 @@ class SignupPage : BasePage() {
                 errors["country"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
                 errors["countryInvalid"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
 
-                // UID Number Field
-                OutlinedTextField(
-                    value = uidNumber,
-                    onValueChange = { uidNumber = it },
-                    label = { Text("UID Number") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    isError = errors["uidNumber"] != null
-                )
-                errors["uidNumber"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
-
-                // Email Field
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                    isError = errors["email"] != null
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                    isError = errors["email"] != null || errors["emailInvalid"] != null
                 )
-                errors["email"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
+                errors["email"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
+                errors["emailInvalid"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
 
-                // Password Field
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -183,13 +184,17 @@ class SignupPage : BasePage() {
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
                     colors = textFieldColors,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     isError = errors["password"] != null
                 )
-                errors["password"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
-                errors["passwordLength"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
+                errors["password"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
+                errors["passwordLength"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
 
-                // Confirm Password Field
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
@@ -197,16 +202,20 @@ class SignupPage : BasePage() {
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
                     colors = textFieldColors,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    isError = errors["confirmPassword"] != null || errors["passwordMismatch"] != null
+                    isError = errors["confirmPassword"] != null
                 )
-                errors["confirmPassword"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
-                errors["passwordMismatch"]?.let { Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall) }
+                errors["confirmPassword"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
+                errors["passwordMismatch"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Terms and Conditions
             val termsAnnotatedString = buildAnnotatedString {
                 pushStringAnnotation(tag = "TERMS", annotation = "terms_and_conditions")
                 withStyle(style = SpanStyle(color = Color(0xFF4285F4), textDecoration = TextDecoration.Underline)) {
@@ -216,13 +225,17 @@ class SignupPage : BasePage() {
             }
             ClickableText(
                 text = termsAnnotatedString,
-                onClick = { setCurrentPage(TermsAndConditions()) },
+                onClick = { offset ->
+                    termsAnnotatedString.getStringAnnotations(tag = "TERMS", start = offset, end = offset)
+                        .firstOrNull()?.let {
+                            setCurrentPage(TermsAndConditions())
+                        }
+                },
                 modifier = Modifier.padding(top = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Checkbox for Terms
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -232,16 +245,18 @@ class SignupPage : BasePage() {
                     onCheckedChange = { isTermsChecked = it },
                     colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4285F4))
                 )
-                Text("I agree with Terms and Conditions")
+                Text(text = "I agree with Terms and Conditions")
+                errors["term check"]?.let {
+                    Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sign Up Button
             Button(
                 onClick = {
                     if (validateInputs()) {
-                        setCurrentPage(SelectCandidatePage(sampleCandidates))
+                        setCurrentPage(SelectElectionPage(sampleElections))
                     }
                 },
                 modifier = Modifier
@@ -250,7 +265,7 @@ class SignupPage : BasePage() {
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
             ) {
-                Text("Sign Up", fontSize = 16.sp, color = Color.White)
+                Text("Register", fontSize = 16.sp, color = Color.White)
             }
         }
     }

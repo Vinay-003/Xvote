@@ -70,6 +70,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation (libs.androidx.material.icons.extended)
     implementation (libs.gson)
+//    implementation ("androidx.compose.foundation:foundation:1.7.5" )// Update as per latest version
+//    implementation (libs.material3)
+
 
 
 //    implementation(libs.androidx.core.ktx)

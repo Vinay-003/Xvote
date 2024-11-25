@@ -49,16 +49,3 @@ class IdConfirmationPage(
     }
 
 }
-//@Preview
-//@Composable
-//fun IdConfirmationPagePreview() {
-//    val sampleCandidate = Candidate("Sample Candidate")
-//    val sampleVoterIdNumber = "123456789"
-//    val sampleVoterIdProof: Uri? = null // Replace with a valid Uri if needed
-//
-//    IdConfirmationPage(
-//        candidate = sampleCandidate,
-//        voterIdNumber = sampleVoterIdNumber,
-//        voterIdProof = sampleVoterIdProof
-//    ).Content(setCurrentPage = {})
-//}

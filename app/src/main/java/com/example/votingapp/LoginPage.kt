@@ -8,11 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.blur
 
 class LoginPage : BasePage() {
     override val title: String = "Login"
@@ -35,77 +38,113 @@ class LoginPage : BasePage() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF121212)), // Dark background color
-            contentAlignment = Alignment.Center
+                .background(Brush.verticalGradient( // Light gradient background
+                    colors = listOf(Color(0xFFF6F6F6), Color(0xFFE8E8E8))
+                ))
         ) {
+            // Left side glassmorphism effect
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(60.dp)
+                    .align(Alignment.CenterStart)
+                    .graphicsLayer {
+                        alpha = 0.5f
+                    }
+                    .blur(radius = 16.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.White.copy(alpha = 0.3f), Color.White.copy(alpha = 0.1f))
+                        )
+                    )
+            )
+
+            // Right side glassmorphism effect
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(60.dp)
+                    .align(Alignment.CenterEnd)
+                    .graphicsLayer {
+                        alpha = 0.5f
+                    }
+                    .blur(radius = 16.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.White.copy(alpha = 0.3f), Color.White.copy(alpha = 0.1f))
+                        )
+                    )
+            )
+
+            // Center Card
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)), // Dark card color
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White // Simple card without translucency
+                ),
                 modifier = Modifier
                     .width(300.dp)
                     .padding(16.dp)
+                    .align(Alignment.Center)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Profile icon placeholder with dark color
+                    // Profile icon placeholder
                     Box(
                         modifier = Modifier
                             .size(80.dp)
-                            .background(Color(0xFF333333), CircleShape), // Darker circle color
+                            .background(Color(0xFFE8E8E8), CircleShape), // Light gray circle
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("👤", fontSize = 32.sp, color = Color.White) // White icon text
+                        Text("👤", fontSize = 32.sp, color = Color(0xFF555555)) // Dark gray icon text
                     }
 
-                    // Login text in white
+                    // Login text in dark gray
                     Text(
                         text = "Login",
                         fontSize = 24.sp,
-                        color = Color.White
+                        color = Color(0xFF333333) // Dark gray color
                     )
 
-                    // Email field with dark colors
+                    // Email field
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email", color = Color.Gray) },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedTextColor = Color.White,       // Set input text color when focused to white
-                            unfocusedTextColor = Color.White,     // Set input text color when unfocused to white
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color(0xFFBB86FC), // Light purple color for focused border
+                            cursorColor = Color(0xFF4285F4), // Theme color
+                            focusedBorderColor = Color(0xFF4285F4),
                             unfocusedBorderColor = Color.Gray
                         ),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black), // Set the text color to black
                         modifier = Modifier.fillMaxWidth()
                     )
 
-// Password field with dark colors
+                    // Password field
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password", color = Color.Gray) },
                         visualTransformation = PasswordVisualTransformation(),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedTextColor = Color.White,       // Set input text color when focused to white
-                            unfocusedTextColor = Color.White,     // Set input text color when unfocused to white
-                            cursorColor = Color.White,
-                            focusedBorderColor = Color(0xFFBB86FC),
+                            cursorColor = Color(0xFF4285F4),
+                            focusedBorderColor = Color(0xFF4285F4),
                             unfocusedBorderColor = Color.Gray
                         ),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black), // Set the text color to black
                         modifier = Modifier.fillMaxWidth()
                     )
 
-
                     // Error message display
                     errorMessage?.let {
-                        Text(it, color = Color(0xFFFF6F61)) // Error color in light red
+                        Text(it, color = Color(0xFFFF6F61)) // Light red error message
                     }
 
-                    // Login button with dark theme colors
+                    // Login button
                     Button(
                         onClick = {
                             if (email.isEmpty() || password.isEmpty()) {
@@ -119,12 +158,12 @@ class LoginPage : BasePage() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBB86FC)) // Light purple button color
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)) // Theme color for button
                     ) {
                         Text("Login", color = Color.White)
                     }
 
-                    // Remember Me and Forgot Password section with dark colors
+                    // Remember Me and Forgot Password section
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -137,14 +176,14 @@ class LoginPage : BasePage() {
                                 colors = CheckboxDefaults.colors(
                                     checkmarkColor = Color.White,
                                     uncheckedColor = Color.Gray,
-                                    checkedColor = Color(0xFFBB86FC) // Light purple for checked color
+                                    checkedColor = Color(0xFF4285F4) // Theme color for checkbox
                                 )
                             )
                             Text(text = "Remember", fontSize = 14.sp, color = Color.Gray)
                         }
                         TextButton(
                             onClick = { /* Handle forgot password click */ },
-                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFBB86FC)) // Light purple text color
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF4285F4)) // Theme color for text button
                         ) {
                             Text("Forgot password?", fontSize = 14.sp)
                         }
