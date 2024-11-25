@@ -59,31 +59,31 @@ class SignupPage : BasePage() {
         fun validateInputs(): Boolean {
             val newErrors = mutableMapOf<String, String>()
 
-//            if (name.isBlank()) {
-//                newErrors["name"] = "Name is required"
-//            } else if (phoneNumber.isBlank()) {
-//                newErrors["phoneNumber"] = "Phone Number is required"
-//            } else if (!isValidPhoneNumber(phoneNumber)) {
-//                newErrors["phoneNumberInvalid"] = "Invalid Phone Number"
-//            } else if (country.isBlank()) {
-//                newErrors["country"] = "Country is required"
-//            } else if (!countryList.contains(country)) {
-//                newErrors["countryInvalid"] = "Invalid Country Name"
-//            } else if (uidNumber.isBlank()) {
-//                newErrors["uidNumber"] = "UID Number is required"
-//            } else if (email.isBlank()) {
-//                newErrors["email"] = "Email is required"
-//            } else if (password.isBlank()) {
-//                newErrors["password"] = "Password is required"
-//            } else if (confirmPassword.isBlank()) {
-//                newErrors["confirmPassword"] = "Confirm Password is required"
-//            } else if (password != confirmPassword) {
-//                newErrors["passwordMismatch"] = "Passwords do not match"
-//            } else if (password.length <= 6) {
-//                newErrors["passwordLength"] = "Password must be longer than 6 characters"
-//            } else if (!isTermsChecked) {
-//                newErrors["termsUnchecked"] = "You must agree to the Terms and Conditions"
-//            }
+            if (name.isBlank()) {
+                newErrors["name"] = "Name is required"
+            } else if (phoneNumber.isBlank()) {
+                newErrors["phoneNumber"] = "Phone Number is required"
+            } else if (!isValidPhoneNumber(phoneNumber)) {
+                newErrors["phoneNumberInvalid"] = "Invalid Phone Number"
+            } else if (country.isBlank()) {
+                newErrors["country"] = "Country is required"
+            } else if (!countryList.contains(country)) {
+                newErrors["countryInvalid"] = "Invalid Country Name"
+            } else if (uidNumber.isBlank()) {
+                newErrors["uidNumber"] = "UID Number is required"
+            } else if (email.isBlank()) {
+                newErrors["email"] = "Email is required"
+            } else if (password.isBlank()) {
+                newErrors["password"] = "Password is required"
+            } else if (confirmPassword.isBlank()) {
+                newErrors["confirmPassword"] = "Confirm Password is required"
+            } else if (password != confirmPassword) {
+                newErrors["passwordMismatch"] = "Passwords do not match"
+            } else if (password.length <= 6) {
+                newErrors["passwordLength"] = "Password must be longer than 6 characters"
+            } else if (!isTermsChecked) {
+                newErrors["termsUnchecked"] = "You must agree to the Terms and Conditions"
+            }
 
             errors = newErrors
             return newErrors.isEmpty()
